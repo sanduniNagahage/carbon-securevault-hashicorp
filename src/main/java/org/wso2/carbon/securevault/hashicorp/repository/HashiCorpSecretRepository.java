@@ -65,22 +65,26 @@ public class HashiCorpSecretRepository implements SecretRepository {
     private String enginePath;
     private int engineVersion;
 
-    private String textFileName;
-    private String textFileName_tmp;
-    private String textFilePersist;
+    private static String textFileName;
+    private static String textFileName_tmp;
+    private static String textFilePersist;
     private boolean persistToken = false;
     private String rootToken;
     private static File tokenFile;
+    private String propertyPrefix;
 
     public HashiCorpSecretRepository(IdentityKeyStoreWrapper identityKeyStoreWrapper,
                                      TrustKeyStoreWrapper trustKeyStoreWrapper) {
 
         this.identityKeyStoreWrapper = identityKeyStoreWrapper;
         this.trustKeyStoreWrapper = trustKeyStoreWrapper;
+
+        propertyPrefix = "secretRepositories.vault.properties.";
     }
 
     public HashiCorpSecretRepository(){
 
+        propertyPrefix = "secretProviders.vault.repositories.hashicorp.properties.";
     }
 
     /**
@@ -97,11 +101,11 @@ public class HashiCorpSecretRepository implements SecretRepository {
         // Load Configurations
         HashiCorpVaultConfigLoader hashiCorpVaultConfigLoader = HashiCorpVaultConfigLoader.getInstance();
         try {
-            address = hashiCorpVaultConfigLoader.getProperty(ADDRESS_PARAMETER);
-            namespace = hashiCorpVaultConfigLoader.getProperty(NAMESPACE_PARAMETER);
-            enginePath = hashiCorpVaultConfigLoader.getProperty(ENGINE_PATH_PARAMETER);
+            address = hashiCorpVaultConfigLoader.getProperty(propertyPrefix + ADDRESS_PARAMETER);
+            namespace = hashiCorpVaultConfigLoader.getProperty(propertyPrefix + NAMESPACE_PARAMETER);
+            enginePath = hashiCorpVaultConfigLoader.getProperty(propertyPrefix + ENGINE_PATH_PARAMETER);
 
-            String version = hashiCorpVaultConfigLoader.getProperty(ENGINE_VERSION_PARAMETER);
+            String version = hashiCorpVaultConfigLoader.getProperty(propertyPrefix + ENGINE_VERSION_PARAMETER);
             engineVersion = version != null ? Integer.parseInt(version) : DEFAULT_ENGINE_VERSION;
             retrieveRootToken();
         } catch (HashiCorpVaultException e) {
